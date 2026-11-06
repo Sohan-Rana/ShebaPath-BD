@@ -1,0 +1,28 @@
+databases:
+  - name: shebapath-db
+    plan: basic-256mb
+
+services:
+  - type: web
+    name: shebapath-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: shebapath-db, property: connectionString }
+      - key: ENVIRONMENT
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false   # Vercel frontend URL
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: EMBEDDING_PROVIDER
+        value: openai
+      - key: EMBEDDING_API_KEY
+        sync: false
+# NOTE: Render er DATABASE_URL "postgresql://" diye shuru hoy; app e "postgresql+psycopg://" lagbe.
+# Tai env var e manually "postgresql+psycopg://..." boshan. Managed Postgres e `CREATE EXTENSION vector` support thaka lagbe.
